@@ -22,6 +22,7 @@ rich = "^13.7.1"
 sentencepiece = "^0.2.0"
 nlpaug = "^1.1.11"
 scikit-optimize = "^0.10.1"
+accelerate = "^0.30.1"
 
 
 
@@ -30,6 +31,10 @@ scikit-optimize = "^0.10.1"
 name = "pytorch"
 url = "https://download.pytorch.org/whl/cu118"
 priority = "explicit"
+
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.29.4"
 
 [build-system]
 requires = ["poetry-core"]

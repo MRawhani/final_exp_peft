@@ -92,7 +92,7 @@ def train_mlm_model(model,prepended_path,collator, tokenizer,train_data, eval_da
     training_args = TrainingArguments(
         
         output_dir=f"{Config.RESULTS_SAVE_PATH}/{prepended_path}/results",                 # Where to store the output (checkpoints and predictions)
-        num_train_epochs=10,                     # Total number of training epochs
+        num_train_epochs=20,                     # Total number of training epochs
         per_device_train_batch_size=batch_size,         # Batch size for training
         per_device_eval_batch_size=batch_size,          # Batch size for evaluation
         warmup_steps=500,                       # Number of warmup steps for learning rate scheduler
@@ -115,15 +115,18 @@ def train_mlm_model(model,prepended_path,collator, tokenizer,train_data, eval_da
     )
     def compute_metrics(eval_pred: EvalPrediction):
         logits, labels = eval_pred
-        # Flatten the output for cross-entropy
         shift_logits = logits[..., :-1, :].contiguous()
         shift_labels = labels[..., 1:].contiguous()
-        # Only compute loss on masked tokens
-        loss_fct = torch.nn.CrossEntropyLoss(reduction="sum")
-        loss = loss_fct(shift_logits.view(-1, shift_logits.size(-1)), shift_labels.view(-1))
-        # Calculate perplexity
-        perplexity = torch.exp(loss / shift_labels.ne(-100).sum())
+        shift_logits = shift_logits.view(-1, shift_logits.size(-1))
+        shift_labels = shift_labels.view(-1)
+        loss_fct = torch.nn.CrossEntropyLoss(reduction="sum", ignore_index=-100)
+        loss = loss_fct(shift_logits, shift_labels)
+        non_masked_tokens = shift_labels.ne(-100).sum().item()
+        perplexity = torch.exp(loss / non_masked_tokens)
         return {"perplexity": perplexity.item()}
+   
+    
+
     callbacks = [EarlyStoppingCallback(early_stopping_patience=3)]
 
     trainer = AdapterTrainer(
@@ -181,14 +184,14 @@ def train_mlm_model_without_adapter(model,prepended_path,collator, tokenizer,tra
     )
     def compute_metrics(eval_pred: EvalPrediction):
         logits, labels = eval_pred
-        # Flatten the output for cross-entropy
         shift_logits = logits[..., :-1, :].contiguous()
         shift_labels = labels[..., 1:].contiguous()
-        # Only compute loss on masked tokens
-        loss_fct = torch.nn.CrossEntropyLoss(reduction="sum")
-        loss = loss_fct(shift_logits.view(-1, shift_logits.size(-1)), shift_labels.view(-1))
-        # Calculate perplexity
-        perplexity = torch.exp(loss / shift_labels.ne(-100).sum())
+        shift_logits = shift_logits.view(-1, shift_logits.size(-1))
+        shift_labels = shift_labels.view(-1)
+        loss_fct = torch.nn.CrossEntropyLoss(reduction="sum", ignore_index=-100)
+        loss = loss_fct(shift_logits, shift_labels)
+        non_masked_tokens = shift_labels.ne(-100).sum().item()
+        perplexity = torch.exp(loss / non_masked_tokens)
         return {"perplexity": perplexity.item()}
     trainer = Trainer(
         model=model,                           # The instantiated 🤗 Transformers model to be trained
@@ -197,7 +200,7 @@ def train_mlm_model_without_adapter(model,prepended_path,collator, tokenizer,tra
         eval_dataset=eval_data if eval_data is not None else None,
         data_collator=collator,
         tokenizer=tokenizer,
-        # compute_metrics=compute_metrics
+        compute_metrics=compute_metrics
             )
     
     return trainer
