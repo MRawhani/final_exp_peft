@@ -1,5 +1,5 @@
 /datasets/
-**/saved/
+/domain_adaptation_project/saved/
 **/lightning_logs/
 **/wandb/
 
