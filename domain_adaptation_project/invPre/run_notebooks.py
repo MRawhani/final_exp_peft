@@ -26,11 +26,11 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 
 # Define the list of folders and their respective notebooks
 folders_and_notebooks = {
-     'fiction': ['SF_invPre.ipynb', 'GF_invPre.ipynb', 'TEF_invPre.ipynb', 'TRF_invPre.ipynb'],
+    #  'fiction': ['GF_invPre.ipynb'],
     # 'slate': ['FS_invPre.ipynb', 'GS_invPre.ipynb', 'TES_invPre.ipynb', 'TRS_invPre.ipynb'],
-    'government':  ['FG_invPre.ipynb', 'SG_invPre.ipynb', 'TEG_invPre.ipynb', 'TRG_invPre.ipynb'],
+    # 'government':  [ 'TEG_invPre.ipynb', 'TRG_invPre.ipynb'],
     # 'telephone':  ['FTE_invPre.ipynb', 'GTE_invPre.ipynb', 'STE_invPre.ipynb', 'TRTE_invPre.ipynb'],
-    # 'travel': ['FTR_invPre.ipynb', 'STR_invPre.ipynb', 'GTR_invPre.ipynb', 'TETR_invPre.ipynb']
+    'travel': ['STR_invPre.ipynb', 'GTR_invPre.ipynb', 'TETR_invPre.ipynb']
 }
 
 # Loop through each folder
